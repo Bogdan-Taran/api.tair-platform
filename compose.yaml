@@ -1,26 +1,11 @@
 services:
-  db:
-    image: postgres:17-alpine
-    restart: unless-stopped
-    environment:
-      POSTGRES_DB: training
-      POSTGRES_USER: training
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD}
-    volumes:
-      - db_data:/var/lib/postgresql/data
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U training -d training"]
-      interval: 5s
-      timeout: 5s
-      retries: 20
   migrate:
     build: .
     env_file: .env
     command: ["alembic", "upgrade", "head"]
-    depends_on:
-      db:
-        condition: service_healthy
+    extra_hosts: ["host.docker.internal:host-gateway"]
   api:
+    extra_hosts: ["host.docker.internal:host-gateway"]
     build: .
     restart: unless-stopped
     env_file: .env
@@ -47,6 +32,5 @@ services:
       api:
         condition: service_healthy
 volumes:
-  db_data:
   caddy_data:
   caddy_config:

@@ -1,4 +1,4 @@
-"""Requires an isolated PostgreSQL database named training_test."""
+"""Requires an isolated MySQL database named training_test."""
 
 import os
 from concurrent.futures import ThreadPoolExecutor
@@ -7,7 +7,7 @@ import pytest
 from test_api import card, pay, training
 
 
-@pytest.mark.skipif(not os.environ.get("TEST_DATABASE_URL"), reason="Requires PostgreSQL test container")
+@pytest.mark.skipif(not os.environ.get("TEST_DATABASE_URL"), reason="Requires MySQL test container")
 def test_parallel_payment_and_attendance_are_not_duplicated(club):
     c = club
     with ThreadPoolExecutor(max_workers=2) as pool:

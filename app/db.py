@@ -11,6 +11,8 @@ class Base(DeclarativeBase):
 engine = create_engine(
     settings().database_url,
     pool_pre_ping=True,
+    pool_recycle=1800,
+    **({"isolation_level": "READ COMMITTED"} if settings().database_url.startswith("mysql") else {}),
     connect_args={"check_same_thread": False} if settings().database_url.startswith("sqlite") else {},
 )
 if engine.dialect.name == "sqlite":

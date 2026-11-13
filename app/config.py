@@ -16,8 +16,8 @@ class Settings(BaseSettings):
 
     @model_validator(mode="after")
     def production(self):
-        if self.environment == "production" and not self.database_url.startswith("postgresql"):
-            raise ValueError("Production requires PostgreSQL")
+        if self.environment == "production" and not self.database_url.startswith("mysql+pymysql://"):
+            raise ValueError("Production requires MySQL with the PyMySQL driver")
         return self
 
 

@@ -353,3 +353,36 @@ def test_migrations_round_trip(tmp_path):
         engine.dispose()
     finally:
         settings().database_url = original
+
+
+def test_independent_admins_have_equal_permissions_and_audit_authors(club):
+    c = club
+    first = c["client"].get("/api/v1/me").json()
+    second = c["post"](
+        "/users",
+        {"username": "second-admin", "name": "Второй администратор", "password": "another-password-123"},
+    )
+    token = (
+        c["client"]
+        .post("/api/v1/auth/login", json={"username": "second-admin", "password": "another-password-123"})
+        .json()
+    )
+    c["client"].headers["Authorization"] = "Bearer " + token["access_token"]
+    assert c["client"].get("/api/v1/me").json()["id"] == second["id"]
+    c["post"]("/branches", {"name": "Создан вторым администратором"})
+    assert c["client"].get("/api/v1/athletes").status_code == 200
+    assert report(c)["attended"] == 0
+    logs = c["client"].get("/api/v1/audit").json()["items"]
+    assert {first["id"], second["id"]} <= {entry["user_id"] for entry in logs}
+    c["client"].headers["Authorization"] = "Bearer " + c["tokens"]["access_token"]
+    assert c["client"].get("/api/v1/me").json()["id"] == first["id"]
+
+
+def test_archived_tariffs_can_share_category(club):
+    c = club
+    for i in range(2):
+        c["post"](
+            "/tariffs",
+            {"name": f"Старый разовый {i}", "lessons": 1, "amount_kopecks": 45000, "archived": True},
+        )
+    assert c["client"].get("/api/v1/tariffs", params={"archived": True}).json()["total"] == 2

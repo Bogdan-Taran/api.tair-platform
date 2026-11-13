@@ -5,6 +5,7 @@ from sqlalchemy import (
     JSON,
     Boolean,
     CheckConstraint,
+    Computed,
     Date,
     DateTime,
     ForeignKey,
@@ -13,7 +14,6 @@ from sqlalchemy import (
     String,
     Time,
     UniqueConstraint,
-    text,
 )
 from sqlalchemy.orm import Mapped, mapped_column
 
@@ -100,16 +100,13 @@ class Tariff(Identity, Base):
     lessons: Mapped[int] = mapped_column(Integer)
     amount_kopecks: Mapped[int] = mapped_column(Integer)
     archived: Mapped[bool] = mapped_column(Boolean, default=False)
+    active_lessons: Mapped[int | None] = mapped_column(
+        Integer, Computed("CASE WHEN archived = 0 THEN lessons ELSE NULL END", persisted=False)
+    )
     __table_args__ = (
         CheckConstraint("lessons IN (1,4,8,12)"),
         CheckConstraint("amount_kopecks > 0"),
-        Index(
-            "uq_tariffs_active_lessons",
-            "lessons",
-            unique=True,
-            postgresql_where=text("NOT archived"),
-            sqlite_where=text("archived = 0"),
-        ),
+        Index("uq_tariffs_active_lessons", "active_lessons", unique=True),
     )
 
 

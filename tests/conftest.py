@@ -23,7 +23,7 @@ def client():
 
         if make_url(test_url).database != "training_test":
             raise RuntimeError("TEST_DATABASE_URL must use the disposable training_test database")
-        engine = create_engine(test_url)
+        engine = create_engine(test_url, isolation_level="READ COMMITTED")
         Base.metadata.drop_all(engine)
     else:
         engine = create_engine("sqlite://", connect_args={"check_same_thread": False}, poolclass=StaticPool)

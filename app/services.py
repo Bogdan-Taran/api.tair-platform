@@ -8,7 +8,9 @@ from app.models import Athlete, Attendance, Audit, Enrollment, Payment, Training
 
 
 def snapshot(obj):
-    return jsonable_encoder({c.key: getattr(obj, c.key) for c in inspect(obj).mapper.column_attrs})
+    return jsonable_encoder(
+        {c.key: getattr(obj, c.key) for c in inspect(obj).mapper.column_attrs if not c.columns[0].computed}
+    )
 
 
 def get(db, model, entity_id, lock=False, active=False):
