@@ -1,0 +1,9 @@
+FROM python:3.14-slim
+WORKDIR /app
+COPY requirements.lock requirements-dev.lock pyproject.toml ./
+RUN pip install --no-cache-dir -r requirements-dev.lock
+COPY app ./app
+COPY migrations ./migrations
+COPY alembic.ini ./
+COPY tests ./tests
+CMD ["pytest", "-q"]

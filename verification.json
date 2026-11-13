@@ -1,0 +1,17 @@
+{
+  "automated_tests": {
+    "passed": 15,
+    "skipped": 1,
+    "skipped_reason": "PostgreSQL test server unavailable"
+  },
+  "postman_http_checks": {
+    "passed": 4,
+    "failed": 0
+  },
+  "ruff": "passed",
+  "migration_roundtrip": "passed on SQLite",
+  "postgresql_ddl_compilation": "passed",
+  "compose_configs": "both passed",
+  "docker_image_build": "not run: Docker daemon unavailable",
+  "figma_review": "unavailable: selection error and MCP plan limit"
+}
